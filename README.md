@@ -1,4 +1,4 @@
-# streaming-01 — SSE + BFF streaming demo
+# SSE + BFF streaming demo
 
 A Next.js demo that shows how to integrate Server-Sent Events (SSE) into a frontend, with a BFF (Backend for Frontend) layer that bridges an external HTTP streaming service to the browser.
 
@@ -62,13 +62,13 @@ Tests use MSW to intercept both layers:
 
 ## Key files
 
-| Path | Purpose |
-|------|---------|
-| `app/api/stream/http-adapter.ts` | Reads NDJSON stream from upstream over HTTP |
-| `app/api/stream/create-sse-response.ts` | Wraps an async iterable of events into an SSE `Response` |
-| `app/api/stream/market/route.ts` | BFF route: fetches upstream, maps events, returns SSE |
-| `app/api/stream/market/map-event.ts` | Transforms upstream NDJSON shapes to SSE event shapes |
-| `app/sse/use-market-stream.ts` | React hook that opens an `EventSource` and manages state |
-| `app/dev-mocks/handlers.ts` | MSW handler simulating the upstream NDJSON feed for local dev |
-| `test/default-handlers.ts` | MSW handlers for both BFF and browser layers used in tests |
-| `instrumentation.ts` | Starts MSW in the Node.js runtime when `MSW=true` |
+| Path                                    | Purpose                                                       |
+| --------------------------------------- | ------------------------------------------------------------- |
+| `app/api/stream/http-adapter.ts`        | Reads NDJSON stream from upstream over HTTP                   |
+| `app/api/stream/create-sse-response.ts` | Wraps an async iterable of events into an SSE `Response`      |
+| `app/api/stream/market/route.ts`        | BFF route: fetches upstream, maps events, returns SSE         |
+| `app/api/stream/market/map-event.ts`    | Transforms upstream NDJSON shapes to SSE event shapes         |
+| `app/sse/use-market-stream.ts`          | React hook that opens an `EventSource` and manages state      |
+| `app/dev-mocks/handlers.ts`             | MSW handler simulating the upstream NDJSON feed for local dev |
+| `test/default-handlers.ts`              | MSW handlers for both BFF and browser layers used in tests    |
+| `instrumentation.ts`                    | Starts MSW in the Node.js runtime when `MSW=true`             |
