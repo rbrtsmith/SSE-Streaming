@@ -20,6 +20,7 @@ export default defineConfig({
       exclude: [
         "app/**/*.test.{ts,tsx}",
         "app/**/*.d.ts",
+        "app/**/types.ts",
         "app/layout.tsx",
         "app/dev-mocks/**",
       ],
