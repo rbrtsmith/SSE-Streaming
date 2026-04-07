@@ -1,44 +1,40 @@
 import { useEffect, useState } from "react";
 import type { ConnectionState } from "../types";
+import type {
+  SSEPriceEvent,
+  SSEMarketStatusEvent,
+} from "../api/stream/market/types";
 
-type PriceUpdate = {
-  type: "price-update";
-  symbol: string;
-  price: number;
-  timestamp: string;
-};
-
-type MarketStatusUpdate = {
-  type: "market-status-update";
-  status: "open" | "closed" | "auction";
-  timestamp: string;
-};
+type PriceData = SSEPriceEvent["data"];
+type MarketStatusData = SSEMarketStatusEvent["data"];
 
 export const useMarketStream = (url: string) => {
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("connecting");
-  const [latestPrice, setLatestPrice] = useState<PriceUpdate | null>(null);
-  const [marketStatus, setMarketStatus] = useState<
-    MarketStatusUpdate["status"] | null
-  >(null);
+  const [latestPrice, setLatestPrice] = useState<PriceData | null>(null);
+  const [marketStatus, setMarketStatus] = useState<MarketStatusData | null>(
+    null,
+  );
 
   useEffect(() => {
     const eventSource = new EventSource(url);
 
     eventSource.onopen = () => setConnectionState("open");
 
-    eventSource.onerror = () => setConnectionState("error");
+    eventSource.onerror = () => {
+      setConnectionState(
+        eventSource.readyState === EventSource.CLOSED ? "error" : "connecting",
+      );
+    };
 
     eventSource.addEventListener("price-update", (event) => {
-      const data = JSON.parse((event as MessageEvent).data) as PriceUpdate;
+      const data = JSON.parse(event.data) as PriceData;
       setLatestPrice(data);
     });
 
     eventSource.addEventListener("market-status-update", (event) => {
-      const data = JSON.parse(
-        (event as MessageEvent).data,
-      ) as MarketStatusUpdate;
-      setMarketStatus(data.status);
+      const data = JSON.parse(event.data) as MarketStatusData;
+      setMarketStatus(data);
     });
 
     return () => {
