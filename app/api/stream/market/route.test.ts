@@ -102,6 +102,24 @@ test("uses an empty symbol for an unrecognised instrument", async () => {
   expect(priceEvent?.data).toMatchObject({ symbol: "" });
 });
 
+test("sends a stream-error event when the upstream emits an unknown event type", async () => {
+  server.use(
+    http.get(UPSTREAM_STREAM_URL, () => {
+      return new HttpResponse(
+        createUpstreamStream([{ eventType: "unknown-future-type" }]),
+      );
+    }),
+  );
+
+  const response = await GET();
+  const events = await readSSEEvents(response.body!);
+
+  expect(events.at(-1)).toEqual({
+    event: "stream-error",
+    data: expect.objectContaining({ type: "stream-error" }),
+  });
+});
+
 test("returns 502 when the upstream stream cannot be established", async () => {
   server.use(
     http.get(UPSTREAM_STREAM_URL, () => {

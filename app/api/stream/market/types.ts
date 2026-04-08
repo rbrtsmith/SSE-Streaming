@@ -1,18 +1,15 @@
-export type UpstreamPriceEvent = {
-  eventType: "price";
-  instrument: string;
-  mid: number;
-  asOf: string;
-};
-export type UpstreamMarketStatusEvent = {
-  eventType: "market-status";
-  state: "open" | "closed" | "auction";
-  asOf: string;
-};
+import { z } from "zod";
+import {
+  UpstreamPriceEventSchema,
+  UpstreamMarketStatusEventSchema,
+  UpstreamMarketEventSchema,
+} from "./upstream-schemas";
 
-export type UpstreamMarketEvent =
-  | UpstreamPriceEvent
-  | UpstreamMarketStatusEvent;
+export type UpstreamPriceEvent = z.infer<typeof UpstreamPriceEventSchema>;
+export type UpstreamMarketStatusEvent = z.infer<
+  typeof UpstreamMarketStatusEventSchema
+>;
+export type UpstreamMarketEvent = z.infer<typeof UpstreamMarketEventSchema>;
 
 export type SSEPriceEvent = {
   event: "price-update";

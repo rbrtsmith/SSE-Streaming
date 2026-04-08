@@ -5,11 +5,12 @@ import {
 import { subscribeToHttpStream } from "@/app/api/stream/http-adapter";
 
 import { mapEvent } from "./map-event";
+import { UpstreamMarketEventSchema } from "./upstream-schemas";
 import { type UpstreamMarketEvent } from "./types";
 
 const UPSTREAM_URL = `${process.env.UPSTREAM_BASE_URL}/market-stream`;
 
-async function* marketEvents(
+async function* extractAndMapEvents(
   upstream: AsyncGenerator<UpstreamMarketEvent>,
 ): AsyncGenerator<SseEvent> {
   yield {
@@ -24,9 +25,12 @@ async function* marketEvents(
 
 export async function GET() {
   try {
-    const feed = await subscribeToHttpStream<UpstreamMarketEvent>(UPSTREAM_URL);
+    const feed = await subscribeToHttpStream(
+      UPSTREAM_URL,
+      UpstreamMarketEventSchema,
+    );
 
-    return createSseResponse(marketEvents(feed.events));
+    return createSseResponse(extractAndMapEvents(feed.events));
   } catch {
     return new Response("Upstream stream unavailable", { status: 502 });
   }

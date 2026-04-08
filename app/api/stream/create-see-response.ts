@@ -18,7 +18,9 @@ export function createSseResponse(events: AsyncIterable<SseEvent>) {
         }
 
         controller.close();
-      } catch {
+      } catch (error) {
+        // TODO: replace with Sentry or equivalent error reporting
+        console.error("[stream] Error in SSE stream:", error);
         controller.enqueue(
           encoder.encode(
             toSse("stream-error", {

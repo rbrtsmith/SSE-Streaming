@@ -1,9 +1,12 @@
+import { z } from "zod";
+
 export type UpstreamFeed<T> = {
   events: AsyncGenerator<T>;
 };
 
 export async function subscribeToHttpStream<T>(
   url: string,
+  schema: z.ZodType<T>,
 ): Promise<UpstreamFeed<T>> {
   const response = await fetch(url, {
     headers: { Accept: "text/plain" },
@@ -32,7 +35,7 @@ export async function subscribeToHttpStream<T>(
 
         for (const line of lines) {
           if (!line.trim()) continue;
-          yield JSON.parse(line) as T;
+          yield schema.parse(JSON.parse(line));
         }
       }
     } finally {
